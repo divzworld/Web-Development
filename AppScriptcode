@@ -1,0 +1,49 @@
+function createGoogleForm() {
+  // Create a new form
+  var form = FormApp.create('Sample Form');
+  
+  // Add Name field
+  form.addTextItem()
+      .setTitle('Name')
+      .setRequired(true);
+  
+  // Add Phone Number field with a description
+  form.addTextItem()
+      .setTitle('Phone Number')
+      .setHelpText('Enter your phone number (10 digits only). Do not include +91.')
+      .setRequired(true);
+  
+  // Add Address field
+  form.addParagraphTextItem()
+      .setTitle('Address')
+      .setRequired(true);
+  
+  // Log the URL of the form
+  Logger.log('Form created: ' + form.getPublishedUrl());
+  
+  // Add a trigger to process form responses
+  ScriptApp.newTrigger('processFormResponses')
+      .forForm(form)
+      .onFormSubmit()
+      .create();
+}
+
+function processFormResponses(e) {
+  var responses = e.response.getItemResponses();
+  var phoneNumber = '';
+  
+  // Loop through responses to find the Phone Number field
+  for (var i = 0; i < responses.length; i++) {
+    var question = responses[i].getItem().getTitle();
+    if (question === 'Phone Number') {
+      phoneNumber = responses[i].getResponse();
+      
+      // Add +91 if not already present
+      if (!phoneNumber.startsWith('+91')) {
+        phoneNumber = '+91' + phoneNumber;
+      }
+      
+      Logger.log('Processed Phone Number: ' + phoneNumber);
+    }
+  }
+}
